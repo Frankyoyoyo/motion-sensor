@@ -1,3 +1,6 @@
+clear
+clc
+
 s = serial('COM3');  %定义串口对象
 set(s,'BaudRate',9600);  %设置波特率s
 fopen(s);  %打开串口对象s
@@ -16,3 +19,20 @@ while(t<interval)
     
 end
 fclose(s);  %关闭串口对象s
+
+% clear
+% clc
+% 
+% s=serial('COM3');
+% set(s,'BaudRate',9600); 
+% fopen(s); 
+% 
+% a=fgetl(s);
+% h=plot(a,'.');
+% set(h,'EraseMode','xor')
+% for i=0:100
+%     a = fgetl(s);
+%     drawnow;
+% end
+% 
+% fclose(s); 
