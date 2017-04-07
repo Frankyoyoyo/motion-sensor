@@ -9,5 +9,5 @@ void setup()
 void loop()
 {
   val = analogRead(analogPin);
-  Serial.println(val);
+  Serial.println("1+2*i");
 }
