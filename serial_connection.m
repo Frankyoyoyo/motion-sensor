@@ -7,10 +7,12 @@ fopen(s);  %打开串口对象s
 
 interval = 100;  %这里开始的代码很Part1里的代码类似
 
-fgetl(s)
-A=[str2num(fgetl(s));str2num(fgetl(s));str2num(fgetl(s))]
-
-B=A+[1;2;3]
+while(1)
+    fgetl(s)
+    A=[str2num(fgetl(s));str2num(fgetl(s));str2num(fgetl(s))];
+    G=[str2num(fgetl(s));str2num(fgetl(s));str2num(fgetl(s))];
+    M=[str2num(fgetl(s));str2num(fgetl(s));str2num(fgetl(s))];
+end
 % while(fgetl(s))
 %     A=[fgetl(s),fgetl(s),fgetl(s)]
 %     B=[fgetl(s),fgetl(s),fgetl(s)]
