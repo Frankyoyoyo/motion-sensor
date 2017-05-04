@@ -1,15 +1,11 @@
-/**
- @file read9axis.ino
- @brief This is an Example for the FaBo 9Axis I2C Brick.
+/*
+  connection:
+  VCC-3.3V
+  GND-GND
+  SDA-A4
+  SCL-A5
+ */
 
-   http://fabo.io/202.html
-
-   Released under APACHE LICENSE, VERSION 2.0
-
-   http://www.apache.org/licenses/
-
- @author FaBo<info@fabo.io>
-*/
 
 #include <Wire.h>
 #include <FaBo9Axis_MPU9250.h>
@@ -22,7 +18,7 @@ FaBo9Axis fabo_9axis;
 
 void setup() {
   Serial.begin(9600);
-/*  Serial.println("RESET");
+ /* Serial.println("RESET");
   Serial.println();
 
   Serial.println("configuring device.");
@@ -78,6 +74,6 @@ void loop() {
 
  /* Serial.print("temp: ");
   Serial.println(temp);
-
-  delay(1000);*/
+*/
+  delay(1000);
 }
