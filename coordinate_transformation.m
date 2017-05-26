@@ -1,73 +1,79 @@
-%A=[str2num(fgetl(s));str2num(fgetl(s));str2num(fgetl(s))];
-%G=[str2num(fgetl(s));str2num(fgetl(s));str2num(fgetl(s))];
-%M=[str2num(fgetl(s));str2num(fgetl(s));str2num(fgetl(s))];
+function coordinate_transformation             
+	Kp=2;
+	Ki=0.01;
+	halfT=0.004;       %half sampling period/Hz
+    global A G M q0 q1 q2 q3
+    
+    
+%     A=[0,0,1];
+%     G=[0,0,0];
+%     M=[1,0,0];
+% 	
+    
 
-	f=125;               %é‡‡æ ·é¢‘ç‡/Hz
-	Kp=2*fï¼›
-	Ki=0.005*f;
-	halfT=0.5*f;
-	
-	q0=1;
-	q1=0;
-	q2=0;
-	q3=0;                %å››å…ƒæ•°4ä¸ªå‚æ•°a,b,c,d,(v=q0+q1i+q2j+q3k)
+    exInt=0;eyInt=0;ezInt=0;
 	
 %-------------------------------------------------------------------------
 	norm=sqrt(A(1,1)*A(1,1)+A(1,2)*A(1,2)+A(1,3)*A(1,3));
 	ax=A(1,1)/norm;
 	ay=A(1,2)/norm;
 	az=A(1,3)/norm;
-	A=[ax;ay;az];
+	A=[ax,ay,az];            %¼ÓËÙ¶ÈÊ¸Á¿
 %-------------------------------------------------------------------------	
 	norm=sqrt(M(1,1)*M(1,1)+M(1,2)*M(1,2)+M(1,3)*M(1,3));
 	mx=M(1,1)/norm;
 	my=M(1,2)/norm;
 	mz=M(1,3)/norm;
-	M=[mx;my;mz];
-	                     %å¯¹åŠ é€Ÿåº¦ä¼ æ„Ÿå™¨å’Œç£åœºä¼ æ„Ÿå™¨çš„æ•°å€¼å½’ä¸€åŒ–æ–¹ä¾¿è®¡ç®—
+	M=[mx,my,mz];
+	                  
 %-------------------------------------------------------------------------
 	hx=2*mx*(0.5-q2*q2-q3*q3)+2*my*(q1*q2-q0*q3)+2*mz*(q1*q3+q0*q2);
 	hy=2*mx*(q1*q2+q0*q3)+2*my*(0.5-q1*q1-q3*q3)+2*mz*(q2*q3-q0*q1);
 	hz=2*mx*(q1*q3-q0*q2)+2*my*(q2*q3+q0*q1)+2*mz*(0.5-q1*q1-q2*q2);
-	H=[hx;hy;hz];        %ä¼ æ„Ÿå™¨å‚è€ƒç³»ä¸Šçš„åœ°ç£çŸ¢é‡è½¬æ¢åˆ°é™æ­¢åæ ‡ç³»åçš„çŸ¢é‡
-	
-	bx=sqrt(hx*hx+hy*hy);
-	bz=hz;               %è¯¯å·®å‡½æ•°
+	H=[hx,hy,hz]; %·ÉĞĞÆ÷²Î¿¼ÏµÉÏµÄµØ´ÅÊ¸Á¿×ª»»µ½µØÀí×ø±êÏµºóµÄÊ¸Á¿     
+    
+	bx=sqrt(hx*hx+hy*hy);    %Îó²îº¯Êı
+	bz=hz;            
 %-------------------------------------------------------------------------
 	vx=2*(q1*q3-q0*q2);
 	vy=2*(q0*q1+q2*q3);
 	vz=q0*q0-q1*q1-q2*q2-q3*q3;
-	V=[vx;vy;vz];        %æ ‡å‡†å•ä½é‡åŠ›è½¬æ¢åˆ°ä¼ æ„Ÿå™¨å‚è€ƒç³»åå„ä¸ªåæ ‡åˆ†é‡
+	V=[vx,vy,vz];       %ÖØÁ¦×ª»»µ½·ÉĞĞÆ÷²Î¿¼ÏµºóµÄÊ¸Á¿
 	
 	wx=2*bx*(0.5-q2*q2-q3*q3)+2*bz*(q1*q3-q0*q2);
-	wy=2*bx*(q1*q2-q0*q30)+2*bz*(0.5-q1*q1-q2*q2);
+	wy=2*bx*(q1*q2-q0*q3)+2*bz*(0.5-q1*q1-q2*q2);
 	wz=2*bx*(q0*q2+q1*q3)+2*bz*(0.5-q1*q1-q2*q2);
-	W=[wx;wy;wz];
-	                     %å°†bx,bzé‡æ–°è½¬æ¢å›ä¼ æ„Ÿå™¨åæ ‡ç³»åå„ä¸ªåæ ‡åˆ†é‡
+	W=[wx,wy,wz];       %bx£¬bzÖØĞÂ×ª»»µ½·ÉĞĞÆ÷²Î¿¼Ïµ
+	                   
 	
 	ex = (ay*vz - az*vy) + (my*wz - mz*wy);
 	ey = (az*vx - ax*vz) + (mz*wx - mx*wz);
 	ez = (ax*vy - ay*vx) + (mx*wy - my*wx);
-	E=[ex;ey;ez];        %Eä¸ºè¯¯å·®å‘é‡
-						 %æè¿°Aå’ŒMä¸Vå’ŒWçš„åå·®ç¨‹åº¦ï¼ˆAÃ—V+MÃ—Wï¼‰
+	E=[ex,ey,ez];       %=A¡ÁM+V¡ÁW£¬±íÊöÆ«²î³Ì¶È
+
 %=========================================================================	
-	exInt=exlnt+ex*Ki;
-	eyInt=eylnt+ey*Ki;
-	ezInt=ezlnt+ez*Ki;   %å¯¹è¯¯å·®ç§¯åˆ†
+	exInt=exInt+ex*Ki;
+	eyInt=eyInt+ey*Ki;
+	ezInt=ezInt+ez*Ki;      %¶ÔÎó²î»ı·Ö
 	
-	gx = gx + Kp*ex + exInt;
-	gy = gy + Kp*ey + eyInt;
-	gz = gz + Kp*ez + ezInt;%ç”¨è¯¯å·®çš„ç§¯åˆ†å’Œè¯¯å·®æœ¬èº«ä¸Kpçš„ä¹˜ç§¯çš„å’Œå¯¹è§’é€Ÿåº¦è¿›è¡Œè¡¥å¿
+	gx = G(1,1) + Kp*ex + exInt;
+	gy = G(1,2) + Kp*ey + eyInt;
+	gz = G(1,3) + Kp*ez + ezInt;
+          %ÓÃÎó²îµÄ»ı·ÖºÍÎó²î±¾ÉíÓëKpµÄ³Ë»ıµÄºÍ¶Ô½ÇËÙ¶È½øĞĞ²¹³¥
 	
 	q0 = q0 + (-q1*gx - q2*gy - q3*gz)*halfT;
 	q1 = q1 + (q0*gx + q2*gz - q3*gy)*halfT;
 	q2 = q2 + (q0*gy - q1*gz + q3*gx)*halfT;
 	q3 = q3 + (q0*gz + q1*gy - q2*gx)*halfT;
-	                       %é¾™æ ¼åº“å¡”æ³•æ±‚å‡ºå››å…ƒæ•°çš„å€¼
+
 						   
 	norm = sqrt(q0*q0 + q1*q1 + q2*q2 + q3*q3);
 	q0 = q0 / norm;
 	q1 = q1 / norm;
 	q2 = q2 / norm;
-	q3 = q3 / norm;        %å››å…ƒæ•°å½’ä¸€åŒ–
-	
+	q3 = q3 / norm;
+    
+%     fai=atan(2*(q2*q3+q1*q0)/(q1*q1+q2*q2+q3*q3+q0*q0))
+%     theta=asin(-2*(q1*q3-q0*q2))
+%     ksai=atan(2*(q2*q1+q0*q3)/(q0*q0+q1*q1-q2*q2-q3*q3))
+[yaw, pitch, roll] = quat2angle([q0 q1 q2 q3])
