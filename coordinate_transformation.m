@@ -1,14 +1,19 @@
-function coordinate_transformation             
+% function coordinate_transformation             
 	Kp=2;
 	Ki=0.01;
 	halfT=0.004;       %half sampling period/Hz
-    global A G M q0 q1 q2 q3
+    global A G M q0 q1 q2 q3 X Y Z halfT Vx Vy Vz T g
     
-    
-%     A=[0,0,1];
-%     G=[0,0,0];
+%debugging------------------------------------------   
+%     A=[1,0,1];
+%     G=[1,1,0];
 %     M=[1,0,0];
-% 	
+%     q0=1;q1=0;q2=0;q3=0;
+%     Vx=0;Vy=0;Vz=0; 
+%     T=0.008;halfT=0.004;
+%     X=0;Y=0;Z=0;
+%     g=9.81;
+%-------------------------------------------------------	
     
 
     exInt=0;eyInt=0;ezInt=0;
@@ -61,19 +66,19 @@ function coordinate_transformation
 	gz = G(1,3) + Kp*ez + ezInt;
           %用误差的积分和误差本身与Kp的乘积的和对角速度进行补偿
 	
-	q0 = q0 + (-q1*gx - q2*gy - q3*gz)*halfT;
-	q1 = q1 + (q0*gx + q2*gz - q3*gy)*halfT;
-	q2 = q2 + (q0*gy - q1*gz + q3*gx)*halfT;
-	q3 = q3 + (q0*gz + q1*gy - q2*gx)*halfT;
+q0 = q0 + (-q1*gx - q2*gy - q3*gz)*halfT;
+q1 = q1 + (q0*gx + q2*gz - q3*gy)*halfT;
+q2 = q2 + (q0*gy - q1*gz + q3*gx)*halfT;
+q3 = q3 + (q0*gz + q1*gy - q2*gx)*halfT;
 
-						   
-	norm = sqrt(q0*q0 + q1*q1 + q2*q2 + q3*q3);
-	q0 = q0 / norm;
-	q1 = q1 / norm;
-	q2 = q2 / norm;
-	q3 = q3 / norm;
-    
-%     fai=atan(2*(q2*q3+q1*q0)/(q1*q1+q2*q2+q3*q3+q0*q0))
-%     theta=asin(-2*(q1*q3-q0*q2))
-%     ksai=atan(2*(q2*q1+q0*q3)/(q0*q0+q1*q1-q2*q2-q3*q3))
-[yaw, pitch, roll] = quat2angle([q0 q1 q2 q3])
+		   
+        norm = sqrt(q0*q0 + q1*q1 + q2*q2 + q3*q3);
+        q0 = q0 / norm;
+        q1 = q1 / norm;
+        q2 = q2 / norm;
+        q3 = q3 / norm;
+ 
+% [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3])
+
+
+% end
