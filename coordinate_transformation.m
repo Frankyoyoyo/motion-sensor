@@ -1,8 +1,8 @@
 % function coordinate_transformation             
 	Kp=2;
 	Ki=0.01;
-	halfT=0.004;       %half sampling period/Hz
-    global A G M q0 q1 q2 q3 X Y Z halfT Vx Vy Vz T g
+    halfT=t/2;
+    global A G M q0 q1 q2 q3 X Y Z halfT Vx Vy Vz T g t
     
 %debugging------------------------------------------   
 %     A=[1,0,1];
@@ -25,35 +25,38 @@
 	az=A(1,3)/norm;
 	A=[ax,ay,az];            %加速度矢量
 %-------------------------------------------------------------------------	
-	norm=sqrt(M(1,1)*M(1,1)+M(1,2)*M(1,2)+M(1,3)*M(1,3));
-	mx=M(1,1)/norm;
-	my=M(1,2)/norm;
-	mz=M(1,3)/norm;
-	M=[mx,my,mz];
-	                  
-%-------------------------------------------------------------------------
-	hx=2*mx*(0.5-q2*q2-q3*q3)+2*my*(q1*q2-q0*q3)+2*mz*(q1*q3+q0*q2);
-	hy=2*mx*(q1*q2+q0*q3)+2*my*(0.5-q1*q1-q3*q3)+2*mz*(q2*q3-q0*q1);
-	hz=2*mx*(q1*q3-q0*q2)+2*my*(q2*q3+q0*q1)+2*mz*(0.5-q1*q1-q2*q2);
-	H=[hx,hy,hz]; %飞行器参考系上的地磁矢量转换到地理坐标系后的矢量     
-    
-	bx=sqrt(hx*hx+hy*hy);    %误差函数
-	bz=hz;            
+% 	norm=sqrt(M(1,1)*M(1,1)+M(1,2)*M(1,2)+M(1,3)*M(1,3));
+% 	mx=M(1,1)/norm;
+% 	my=M(1,2)/norm;
+% 	mz=M(1,3)/norm;
+% 	M=[mx,my,mz];
+% 	                  
+% %-------------------------------------------------------------------------
+% 	hx=2*mx*(0.5-q2*q2-q3*q3)+2*my*(q1*q2-q0*q3)+2*mz*(q1*q3+q0*q2);
+% 	hy=2*mx*(q1*q2+q0*q3)+2*my*(0.5-q1*q1-q3*q3)+2*mz*(q2*q3-q0*q1);
+% 	hz=2*mx*(q1*q3-q0*q2)+2*my*(q2*q3+q0*q1)+2*mz*(0.5-q1*q1-q2*q2);
+% 	H=[hx,hy,hz]; %飞行器参考系上的地磁矢量转换到地理坐标系后的矢量     
+%     
+% 	bx=sqrt(hx*hx+hy*hy);    %误差函数
+% 	bz=hz;            
 %-------------------------------------------------------------------------
 	vx=2*(q1*q3-q0*q2);
 	vy=2*(q0*q1+q2*q3);
 	vz=q0*q0-q1*q1-q2*q2-q3*q3;
 	V=[vx,vy,vz];       %重力转换到飞行器参考系后的矢量
 	
-	wx=2*bx*(0.5-q2*q2-q3*q3)+2*bz*(q1*q3-q0*q2);
-	wy=2*bx*(q1*q2-q0*q3)+2*bz*(0.5-q1*q1-q2*q2);
-	wz=2*bx*(q0*q2+q1*q3)+2*bz*(0.5-q1*q1-q2*q2);
-	W=[wx,wy,wz];       %bx，bz重新转换到飞行器参考系
+% 	wx=2*bx*(0.5-q2*q2-q3*q3)+2*bz*(q1*q3-q0*q2);
+% 	wy=2*bx*(q1*q2-q0*q3)+2*bz*(0.5-q1*q1-q2*q2);
+% 	wz=2*bx*(q0*q2+q1*q3)+2*bz*(0.5-q1*q1-q2*q2);
+% 	W=[wx,wy,wz];       %bx，bz重新转换到飞行器参考系
 	                   
 	
-	ex = (ay*vz - az*vy) + (my*wz - mz*wy);
-	ey = (az*vx - ax*vz) + (mz*wx - mx*wz);
-	ez = (ax*vy - ay*vx) + (mx*wy - my*wx);
+% 	ex = (ay*vz - az*vy) + (my*wz - mz*wy);
+% 	ey = (az*vx - ax*vz) + (mz*wx - mx*wz);
+% 	ez = (ax*vy - ay*vx) + (mx*wy - my*wx);
+	ex = (ay*vz - az*vy);
+	ey = (az*vx - ax*vz);
+	ez = (ax*vy - ay*vx);
 	E=[ex,ey,ez];       %=A×M+V×W，表述偏差程度
 
 %=========================================================================	
@@ -72,13 +75,12 @@ q2 = q2 + (q0*gy - q1*gz + q3*gx)*halfT;
 q3 = q3 + (q0*gz + q1*gy - q2*gx)*halfT;
 
 		   
-        norm = sqrt(q0*q0 + q1*q1 + q2*q2 + q3*q3);
-        q0 = q0 / norm;
-        q1 = q1 / norm;
-        q2 = q2 / norm;
-        q3 = q3 / norm;
+    norm = sqrt(q0*q0 + q1*q1 + q2*q2 + q3*q3);
+    q0 = q0 / norm;
+    q1 = q1 / norm;
+    q2 = q2 / norm;
+    q3 = q3 / norm;
  
 % [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3])
-
 
 % end
