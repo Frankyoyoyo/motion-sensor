@@ -46,7 +46,7 @@ void loop() {
   Serial.println(my);
   Serial.println(mz);
 
-// delay(10);
+  //delay(1000);
 }
 
 

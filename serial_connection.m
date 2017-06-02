@@ -12,6 +12,8 @@ Vx=0;Vy=0;Vz=0;              %initial velocity
 X=0;Y=0;Z=0;                %initial position
 g=9.81;
 i=0;t=0;                    %for timer usage
+T=t;
+halfT=t/2;
 while(1)
     if(str2double(fgetl(s))~=0)
         continue
@@ -20,10 +22,12 @@ while(1)
         G=[str2double(fgetl(s)),str2double(fgetl(s)),str2double(fgetl(s))];
         M=[str2double(fgetl(s)),str2double(fgetl(s)),str2double(fgetl(s))];
         coordinate_transformation
-%         vector_transformation
+%         [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3])
+        
+        vector_transformation
+     
     end
     
-    [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3])
 %timer--------------------------------t为每次计算所用时间
     if(i==0)
         tic
