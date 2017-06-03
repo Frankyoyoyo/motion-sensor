@@ -25,6 +25,9 @@ while(1)
 %         [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3])
         
         vector_transformation
+        Ax
+        Ay
+        Az
      
     end
     

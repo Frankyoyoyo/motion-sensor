@@ -19,18 +19,18 @@ C=[(q0^2+q1^2-q2^2-q3^2),2*(q1*q2-q0*q3),2*(q1*q3+q0*q2);
     
 Acc=C*A';                %加速度坐标系变换
 
-Ax=Acc(1,1)*g
-Ay=Acc(2,1)*g
-Az=(Acc(3,1)-1)*g    %静止坐标系三轴加速度
+Ax=Acc(1,1)*g;
+Ay=Acc(2,1)*g;
+Az=Acc(3,1)*g;    %静止坐标系三轴加速度
 
 
 Vx=Vx+Ax*T;               %三轴速度
 Vy=Vy+Ay*T;
 Vz=Vz+Az*T;
     
-X=X+Vx*T+(1/2)*Ax*T^2        %三轴位移
-Y=Y+Vy*T+(1/2)*Ay*T^2
-Z=Z+Vz*T+(1/2)*Az*T^2
+X=X+Vx*T+(1/2)*Ax*T^2;        %三轴位移
+Y=Y+Vy*T+(1/2)*Ay*T^2;
+Z=Z+Vz*T+(1/2)*Az*T^2;
      
 % plot3(X,Y,Z);
 % end
