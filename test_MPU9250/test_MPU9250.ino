@@ -35,7 +35,7 @@ void loop() {
   gy=gy*pi/180;
   gz=gz*pi/180;
 
-  Serial.println("0");
+  Serial.println("100");
   Serial.println(ax);
   Serial.println(ay);
   Serial.println(az);
