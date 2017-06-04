@@ -20,17 +20,18 @@ G0=zeros(N,3);G1=zeros(1,3);        %0收集数据，1为校正值
 
 
 while(i<5000)
-    if(str2double(fgetl(s))~=0)
+    if(str2double(fgetl(s))~=100)
         continue
     else
 %main part=================================================================
         A=[str2double(fgetl(s)),str2double(fgetl(s)),str2double(fgetl(s))];
         G=[str2double(fgetl(s)),str2double(fgetl(s)),str2double(fgetl(s))];
 %         M=[str2double(fgetl(s)),str2double(fgetl(s)),str2double(fgetl(s))];
-        coordinate_transformation
+        
+    coordinate_transformation
 
         
-%           vector_transformation
+%vector transformation-------------------------------------------------
         C=[(q0^2+q1^2-q2^2-q3^2),2*(q1*q2-q0*q3),2*(q1*q3+q0*q2);
             2*(q1*q2+q0*q3),(q0^2-q1^2+q2^2-q3^2),2*(q2*q3-q0*q1);
             2*(q1*q3-q0*q2),2*(q2*q3+q0*q1),(q0^2-q1^2-q2^2+q3^2)];
@@ -40,7 +41,7 @@ while(i<5000)
             G0(i+1,1)=(G(1,1));
             G0(i+1,2)=(G(1,2));
             G0(i+1,3)=(G(1,3));
-        elseif i==N                                          %校正算法
+        elseif i==N                                          %校正算法（曲线拟合/平均值）
 %             G1(1,1)=polyfit((1:N),G0(:,1)',0);
 %             G1(1,2)=polyfit((1:N),G0(:,2)',0);
 %             G1(1,3)=polyfit((1:N),G0(:,3)',0);
@@ -89,10 +90,12 @@ while(i<5000)
 %     drawnow
 
 %     plot(i,A_static(2,1),'o')
-%     plot(i,(-1+A(1,3))*9.81,'or')
-%     hold on
-%     axis([1000 1500 -1 1])
-%     drawnow
+    plot(i,A(1,3),'or')
+    hold on
+    axis([1000 1500 0 2])
+    drawnow
+%     A(1,3)
+%     Acc
 %==================
 end
 
