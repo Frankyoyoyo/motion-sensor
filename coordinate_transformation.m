@@ -1,8 +1,9 @@
 % function coordinate_transformation             
 	Kp=2;
 	Ki=0.01;
-    halfT=t/2;
-    global A G M q0 q1 q2 q3 X Y Z halfT Vx Vy Vz T g t
+    halfT=T/2;
+    global A G M q0 q1 q2 q3 halfT T g t G1
+    G=G-G1;
     
 %debugging------------------------------------------   
 %     A=[1,0,1];
@@ -10,7 +11,7 @@
 %     M=[1,0,0];
 %     q0=1;q1=0;q2=0;q3=0;
 %     Vx=0;Vy=0;Vz=0; 
-%     T=0.008;halfT=0.004;
+%     halfT=0.06;
 %     X=0;Y=0;Z=0;
 %     g=9.81;
 %-------------------------------------------------------	

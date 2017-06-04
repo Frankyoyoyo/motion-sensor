@@ -42,9 +42,9 @@ void loop() {
   Serial.println(gx);
   Serial.println(gy);
   Serial.println(gz);
-  Serial.println(mx);
+  /*Serial.println(mx);
   Serial.println(my);
-  Serial.println(mz);
+  Serial.println(mz);*/
 
   //delay(1000);
 }
