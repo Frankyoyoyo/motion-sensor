@@ -29,14 +29,24 @@ while(i<5000)
 %         M=[str2double(fgetl(s)),str2double(fgetl(s)),str2double(fgetl(s))];
         
     coordinate_transformation
-
+    %------------------------
+    if i>2*N
+        for k=1:3
+            if abs(G(1,k))<=0.02
+                G(1,k)=0;
+            end
+        end
+    end
+    %------------------------
         
-%vector transformation-------------------------------------------------
+
+    %vector transformation-------------------------------------------------
         C=[(q0^2+q1^2-q2^2-q3^2),2*(q1*q2-q0*q3),2*(q1*q3+q0*q2);
             2*(q1*q2+q0*q3),(q0^2-q1^2+q2^2-q3^2),2*(q2*q3-q0*q1);
             2*(q1*q3-q0*q2),2*(q2*q3+q0*q1),(q0^2-q1^2-q2^2+q3^2)];
         Acc=C*A'*g;                %加速度坐标系变换
-%get correction with 3*N data----------------------
+
+    %get correction with 3*N data----------------------
         if i<N                                               %取样
             G0(i+1,1)=(G(1,1));
             G0(i+1,2)=(G(1,2));
@@ -62,8 +72,14 @@ while(i<5000)
             A1(3,1)=polyfit((1:N),A0(3,:),0);
         else  
             A_static=Acc-A1;                                  %静止坐标系的：三轴加速度
-
             V_static=V_static+A_static*T;                                   %三轴速度
+        %----------------------------------
+            for j=1:3    
+                if abs(A_static(j,1))<0.03
+                    V_static(j,1)=0;
+                end
+            end
+        %----------------------------------
             R_static=R_static+V_static*T+(1/2)*A_static*T^2;                %三轴位移
         end        
     end
@@ -80,20 +96,23 @@ while(i<5000)
 %-------------------------------------
     i=i+1;
 %=================输出区
-%     [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3])
+
     i
-    T
+    G
+%     A_static
+    [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3])
 %     V_static
+%     R_static
+
 %     plot3(R_static(1,1),R_static(2,1),R_static(3,1),'o');
-%     axis([-2 2 -2 2 -2 2]);
-%     axis equal
+%     axis([-0.5 0.5 -0.5 0.5 -0.5 0.5]);
 %     drawnow
 
 %     plot(i,A_static(2,1),'o')
-    plot(i,A(1,3),'or')
-    hold on
-    axis([1000 1500 0 2])
-    drawnow
+%     plot(i,A(1,3),'or')
+%     hold on
+%     axis([1000 1500 0 2])
+%     drawnow
 %     A(1,3)
 %     Acc
 %==================
