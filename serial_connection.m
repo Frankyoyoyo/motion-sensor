@@ -1,29 +1,29 @@
 clear
 clc
 
-s = serial('COM3');  %定义串口对象
-set(s,'BaudRate',9600);  %设置波特率s
-fopen(s);  %打开串口对象s
+s = serial('COM3');                   %define serial port
+set(s,'BaudRate',9600);               %set baud rate
+fopen(s);                             %open serial port s
 %==============================================================
-N=500;                                %设置校准矩阵长度
+N=500;                                %set the length of correcting matrix
 %=============================================================
 global A G q0 q1 q2 q3 T halfT g G1
-q0=1;q1=0;q2=0;q3=0;                  %4 parameters of the quaternion a,b,c,d,(v=q0+q1i+q2j+q3k)
+q0=1;q1=0;q2=0;q3=0;                  %4 parameters of the quaternion,(v=q0+q1i+q2j+q3k)
 A_static=[0; 0; 0];                   %initial acceleration
 V_static=[0; 0; 0];                   %initial velocity
 R_static=[0; 0; 0];                   %initial position
 g=9.81;
 halfT=T/2;
 i=0;T=0;                              %for timer usage
-A0=zeros(3,N);A1=zeros(3,1);        %for correction
-G0=zeros(N,3);G1=zeros(1,3);        %0收集数据，1为校正值
+A0=zeros(3,N);A1=zeros(3,1);          %for correction
+G0=zeros(N,3);G1=zeros(1,3);          %0-collect data，1-correctiong data
 
 
-while(i<5000)
+while(i<2000)
     if(str2double(fgetl(s))~=100)
         continue
     else
-%main part=================================================================
+%==================main part===============================================
         A=[str2double(fgetl(s)),str2double(fgetl(s)),str2double(fgetl(s))];
         G=[str2double(fgetl(s)),str2double(fgetl(s)),str2double(fgetl(s))];
 %         M=[str2double(fgetl(s)),str2double(fgetl(s)),str2double(fgetl(s))];
@@ -40,25 +40,25 @@ while(i<5000)
     %------------------------
         
 
-    %vector transformation-------------------------------------------------
+    %vector transformation-----------------------------
         C=[(q0^2+q1^2-q2^2-q3^2),2*(q1*q2-q0*q3),2*(q1*q3+q0*q2);
             2*(q1*q2+q0*q3),(q0^2-q1^2+q2^2-q3^2),2*(q2*q3-q0*q1);
             2*(q1*q3-q0*q2),2*(q2*q3+q0*q1),(q0^2-q1^2-q2^2+q3^2)];
-        Acc=C*A'*g;                %加速度坐标系变换
+        Acc=C*A'*g;                                          %vector transformation of acceleration
 
     %get correction with 3*N data----------------------
-        if i<N                                               %取样
+        if i<N                                               %sampling
             G0(i+1,1)=(G(1,1));
             G0(i+1,2)=(G(1,2));
             G0(i+1,3)=(G(1,3));
-        elseif i==N                                          %校正算法（曲线拟合/平均值）
+        elseif i==N                                          %correcting algorithm（curve fitting/average value）
 %             G1(1,1)=polyfit((1:N),G0(:,1)',0);
 %             G1(1,2)=polyfit((1:N),G0(:,2)',0);
 %             G1(1,3)=polyfit((1:N),G0(:,3)',0);
             G1(1,1)=1/N*sum(G0(:,1));
             G1(1,2)=1/N*sum(G0(:,2));
             G1(1,3)=1/N*sum(G0(:,3));
-            q0=1;q1=0;q2=0;q3=0;
+            q0=1;q1=0;q2=0;q3=0;                             %reset quaternion
             A0(1,i-N+1)=(Acc(1,1));
             A0(2,i-N+1)=(Acc(2,1));
             A0(3,i-N+1)=(Acc(3,1));
@@ -71,8 +71,8 @@ while(i<5000)
             A1(2,1)=polyfit((1:N),A0(2,:),0);
             A1(3,1)=polyfit((1:N),A0(3,:),0);
         else  
-            A_static=Acc-A1;                                  %静止坐标系的：三轴加速度
-            V_static=V_static+A_static*T;                                   %三轴速度
+            A_static=Acc-A1;                                  %static coordinate system：acceleration
+            V_static=V_static+A_static*T;                     %                          velocity
         %----------------------------------
             for j=1:3    
                 if abs(A_static(j,1))<0.03
@@ -80,10 +80,10 @@ while(i<5000)
                 end
             end
         %----------------------------------
-            R_static=R_static+V_static*T+(1/2)*A_static*T^2;                %三轴位移
+            R_static=R_static+V_static*T+(1/2)*A_static*T^2;  %                          displacement
         end        
     end
-%timer--------------------------------t为每次计算所用时间
+    %--------------timer------------------(T is the period of each calculation)
     if(i==0)
         tic
     elseif(rem(i,2)==0)
@@ -93,29 +93,27 @@ while(i<5000)
         T=toc;
         tic;
     end
-%-------------------------------------
-    i=i+1;
-%=================输出区
-
+%=================output area================================
     i
-    G
-%     A_static
-    [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3])
-%     V_static
-%     R_static
+    plot3(R_static(1,1),R_static(2,1),R_static(3,1),'o');
+    axis([-0.5 0.5 -0.5 0.5 -0.5 0.5]);
+    drawnow
+%------------debugging-----------------
+%    G
+%	 A
+%    A_static
+%    [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3])
+%    V_static
+%    R_static
 
-%     plot3(R_static(1,1),R_static(2,1),R_static(3,1),'o');
-%     axis([-0.5 0.5 -0.5 0.5 -0.5 0.5]);
-%     drawnow
-
-%     plot(i,A_static(2,1),'o')
-%     plot(i,A(1,3),'or')
-%     hold on
-%     axis([1000 1500 0 2])
-%     drawnow
-%     A(1,3)
-%     Acc
-%==================
+%    plot(i,A(1,3),'or')
+%    hold on
+%    axis([1000 1500 0 2])
+%    drawnow
+%    A(1,3)
+%    Acc
+%===========================================================================
+    i=i+1;
 end
 
 fclose(s)
