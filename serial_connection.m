@@ -12,6 +12,7 @@ q0=1;q1=0;q2=0;q3=0;                  %4 parameters of the quaternion,(v=q0+q1i+
 A_static=[0; 0; 0];                   %initial acceleration
 V_static=[0; 0; 0];                   %initial velocity
 R_static=[0; 0; 0];                   %initial position
+J=[0,0,1];                           %to make A_static stable
 g=9.81;
 halfT=T/2;
 i=0;T=0;                              %for timer usage
@@ -74,7 +75,10 @@ while(i<2000)
             A_static=Acc-A1;                                  %static coordinate system£ºacceleration
             V_static=V_static+A_static*T;                     %                          velocity
         %----------------------------------
-            for j=1:3    
+                if abs(sum(A(1,:).^2)-1)<0.04
+                    A_static=[0;0;0];
+                end
+            for j=1:3
                 if abs(A_static(j,1))<0.03
                     V_static(j,1)=0;
                 end
@@ -100,9 +104,19 @@ while(i<2000)
     drawnow
 %------------debugging-----------------
 %    G
-%	 A
-%    A_static
-%    [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3])
+%    A
+   
+% 	 A_static
+%    V_static
+%    Acc
+%    [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3]);
+
+%    plot(i,R_static(1,1),'or')
+%    hold on
+%    axis([1000 2000 -0.5 0.5])
+%    title('roll(¡ã)-i')
+%    drawnow
+%    
 %    V_static
 %    R_static
 
