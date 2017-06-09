@@ -99,30 +99,29 @@ while(i<2000)
     end
 %=================output area================================
     i
-    plot3(R_static(1,1),R_static(2,1),R_static(3,1),'o');
-    axis([-0.5 0.5 -0.5 0.5 -0.5 0.5]);
-    drawnow
+    A
+%     plot3(R_static(1,1),R_static(2,1),R_static(3,1),'o');
+%     axis([-0.5 0.5 -0.5 0.5 -0.5 0.5]);
+%     drawnow
 %------------debugging-----------------
-%    G
-%    A
-   
+%    G   
 % 	 A_static
 %    V_static
 %    Acc
-%    [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3]);
+   [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3]);
 
-%    plot(i,R_static(1,1),'or')
-%    hold on
-%    axis([1000 2000 -0.5 0.5])
-%    title('roll(бу)-i')
-%    drawnow
-%    
+   plot(i,roll/3.14159*180,'or')
+   hold on
+   axis([1000 2000 -120 120])
+   title('roll(бу)-i')
+   drawnow
+
 %    V_static
 %    R_static
 
 %    plot(i,A(1,3),'or')
 %    hold on
-%    axis([1000 1500 0 2])
+%    axis([1000 2000 0 2])
 %    drawnow
 %    A(1,3)
 %    Acc
