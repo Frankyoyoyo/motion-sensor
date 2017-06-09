@@ -1,11 +1,11 @@
 clear
 clc
 
-s = serial('COM3');                   %define serial port
+s = serial('COM5');                   %define serial port
 set(s,'BaudRate',9600);               %set baud rate
 fopen(s);                             %open serial port s
 %==============================================================
-N=500;                                %set the length of correcting matrix
+N=512;                                %set the length of correcting matrix
 %=============================================================
 global A G q0 q1 q2 q3 T halfT g G1
 q0=1;q1=0;q2=0;q3=0;                  %4 parameters of the quaternion,(v=q0+q1i+q2j+q3k)
@@ -18,23 +18,24 @@ halfT=T/2;
 i=0;T=0;                              %for timer usage
 A0=zeros(3,N);A1=zeros(3,1);          %for correction
 G0=zeros(N,3);G1=zeros(1,3);          %0-collect data，1-correctiong data
+F=zeros(3,N);                         %save data to carry out fft
+P=zeros(3,N);
+Q=1:N;
 
-
-while(i<2000)
+while(i<2500)
     if(str2double(fgetl(s))~=100)
         continue
     else
 %==================main part===============================================
         A=[str2double(fgetl(s)),str2double(fgetl(s)),str2double(fgetl(s))];
         G=[str2double(fgetl(s)),str2double(fgetl(s)),str2double(fgetl(s))];
-%         M=[str2double(fgetl(s)),str2double(fgetl(s)),str2double(fgetl(s))];
         
     coordinate_transformation
     %------------------------
     if i>2*N
-        for k=1:3
-            if abs(G(1,k))<=0.02
-                G(1,k)=0;
+        for j=1:3
+            if abs(G(1,j))<=0.02
+                G(1,j)=0;
             end
         end
     end
@@ -48,43 +49,73 @@ while(i<2000)
         Acc=C*A'*g;                                          %vector transformation of acceleration
 
     %get correction with 3*N data----------------------
-        if i<N                                               %sampling
+        if i<N
             G0(i+1,1)=(G(1,1));
             G0(i+1,2)=(G(1,2));
             G0(i+1,3)=(G(1,3));
-        elseif i==N                                          %correcting algorithm（curve fitting/average value）
+            
+        elseif i==N
 %             G1(1,1)=polyfit((1:N),G0(:,1)',0);
 %             G1(1,2)=polyfit((1:N),G0(:,2)',0);
 %             G1(1,3)=polyfit((1:N),G0(:,3)',0);
             G1(1,1)=1/N*sum(G0(:,1));
             G1(1,2)=1/N*sum(G0(:,2));
             G1(1,3)=1/N*sum(G0(:,3));
-            q0=1;q1=0;q2=0;q3=0;                             %reset quaternion
+            q0=1;q1=0;q2=0;q3=0;
             A0(1,i-N+1)=(Acc(1,1));
             A0(2,i-N+1)=(Acc(2,1));
             A0(3,i-N+1)=(Acc(3,1));
+            
         elseif i<(2*N)
             A0(1,i-N+1)=(Acc(1,1));
             A0(2,i-N+1)=(Acc(2,1));
             A0(3,i-N+1)=(Acc(3,1));
+            
         elseif i==(2*N)
-            A1(1,1)=polyfit((1:N),A0(1,:),0);
-            A1(2,1)=polyfit((1:N),A0(2,:),0);
-            A1(3,1)=polyfit((1:N),A0(3,:),0);
-        else  
-            A_static=Acc-A1;                                  %static coordinate system：acceleration
-            V_static=V_static+A_static*T;                     %                          velocity
-        %----------------------------------
-                if abs(sum(A(1,:).^2)-1)<0.04
-                    A_static=[0;0;0];
+            for(j=1:3)
+                A1=abs(fft(A0(j,:)));
+                for(k=1:N)
+                    if(fftx(1,k)<0.8)
+                    A1(j,k)=0;
+                    end
                 end
-            for j=1:3
-                if abs(A_static(j,1))<0.03
-                    V_static(j,1)=0;
-                end
+                A1(j,:)=ifft(A1(j,:))
             end
-        %----------------------------------
-            R_static=R_static+V_static*T+(1/2)*A_static*T^2;  %                          displacement
+            
+        elseif i<(3*N)
+            A_static=Acc-A1;                                  %static coordinate system：acceleration
+
+            for(j=1:3)
+                F(j,i-2*N)=A_static(j,1);
+            end                                                %fft所用数组的存储（定义）
+        elseif i==(3*N)
+            for(j=1:3)
+                F(j,N)=A_static(j,1);
+                P(j,:)=abs(fft(F(j,:)));
+%                 for(k=1:N)
+%                     if(P(j,k)<0.1)
+%                         P(j,k)=0;
+%                     end
+%                 end
+                F(j,:)=ifft(P(j,:));
+                A_static(j,1)=F(j,N);
+            end
+            
+        else                %i>3*N
+            F=circshift(F,[0,-1]);
+            F(:,N)=A_static;
+            for(j=1:3)
+                P(j,:)=abs(fft(F(j,:)));
+                for(k=1:N)
+                    if(P(j,k)<0.1)
+                        P(j,k)=0;
+                    end
+                end
+                F(j,:)=ifft(P(j,:));
+                A_static(j,1)=F(j,N);
+%                V_static=V_static+A_static*T;                     %                          velocity
+%                R_static=R_static+V_static*T+(1/2)*A_static*T^2;  %                          displacement
+            end
         end        
     end
     %--------------timer------------------(T is the period of each calculation)
@@ -99,36 +130,28 @@ while(i<2000)
     end
 %=================output area================================
     i
-    A
 %     plot3(R_static(1,1),R_static(2,1),R_static(3,1),'o');
 %     axis([-0.5 0.5 -0.5 0.5 -0.5 0.5]);
 %     drawnow
 %------------debugging-----------------
-%    G   
-% 	 A_static
+%    G
+
+	 A_static
 %    V_static
 %    Acc
-   [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3]);
+%    [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3]);
 
-   plot(i,roll/3.14159*180,'or')
-   hold on
-   axis([1000 2000 -120 120])
-   title('roll(°)-i')
-   drawnow
-
-%    V_static
-%    R_static
-
-%    plot(i,A(1,3),'or')
+%    plot(i,roll/3.14159*180,'or')
 %    hold on
-%    axis([1000 2000 0 2])
+%    axis([1000 2000 -120 120])
+%    title('roll(°)-i')
 %    drawnow
-%    A(1,3)
-%    Acc
+
+h=plot(Q,P(2,:));
+drawnow
+delete(h)
 %===========================================================================
     i=i+1;
 end
 
 fclose(s)
-clear
-clc
