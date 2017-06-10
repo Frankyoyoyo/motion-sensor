@@ -1,7 +1,7 @@
 clear
 clc
 
-s = serial('COM5');                   %define serial port
+s = serial('COM7');                   %define serial port
 set(s,'BaudRate',9600);               %set baud rate
 fopen(s);                             %open serial port s
 %==============================================================
@@ -22,7 +22,7 @@ F=zeros(3,N);                         %save data to carry out fft
 P=zeros(3,N);
 Q=1:N;
 
-while(i<2500)
+while(i<1025)
     if(str2double(fgetl(s))~=100)
         continue
     else
@@ -55,9 +55,6 @@ while(i<2500)
             G0(i+1,3)=(G(1,3));
             
         elseif i==N
-%             G1(1,1)=polyfit((1:N),G0(:,1)',0);
-%             G1(1,2)=polyfit((1:N),G0(:,2)',0);
-%             G1(1,3)=polyfit((1:N),G0(:,3)',0);
             G1(1,1)=1/N*sum(G0(:,1));
             G1(1,2)=1/N*sum(G0(:,2));
             G1(1,3)=1/N*sum(G0(:,3));
@@ -73,14 +70,16 @@ while(i<2500)
             
         elseif i==(2*N)
             for(j=1:3)
-                A1=abs(fft(A0(j,:)));
-                for(k=1:N)
-                    if(fftx(1,k)<0.8)
-                    A1(j,k)=0;
-                    end
-                end
-                A1(j,:)=ifft(A1(j,:))
+                A0(j,:)=abs(fft(A0(j,:)));
+%                 for(k=1:N)
+%                     if(A0(j,k)<3)
+%                     A0(j,k)=0;
+%                     end
+%                 end
+%                 A0(j,:)=ifft(A0(j,:));
+%                 A1=
             end
+            
             
         elseif i<(3*N)
             A_static=Acc-A1;                                  %static coordinate system£ºacceleration
@@ -147,9 +146,9 @@ while(i<2500)
 %    title('roll(¡ã)-i')
 %    drawnow
 
-h=plot(Q,P(2,:));
-drawnow
-delete(h)
+% h=plot(Q,P(2,:));
+% drawnow
+% delete(h)
 %===========================================================================
     i=i+1;
 end
