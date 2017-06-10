@@ -1,7 +1,7 @@
 clear
 clc
 
-s = serial('COM3');                   %define serial port
+s = serial('COM7');                   %define serial port
 set(s,'BaudRate',9600);               %set baud rate
 fopen(s);                             %open serial port s
 %==============================================================
@@ -19,6 +19,8 @@ i=0;T=0;                              %for timer usage
 A0=zeros(3,N);A1=zeros(3,1);          %for correction
 G0=zeros(N,3);G1=zeros(1,3);          %0-collect data£¬1-correctiong data
 
+T0=zeros(1,N);
+
 
 while(i<2000)
     if(str2double(fgetl(s))~=100)
@@ -31,9 +33,9 @@ while(i<2000)
         
     coordinate_transformation
     %------------------------
-    if i>2*N
+    if i>N
         for k=1:3
-            if abs(G(1,k))<=0.02
+            if abs(G(1,k))<=0.01
                 G(1,k)=0;
             end
         end
@@ -52,10 +54,12 @@ while(i<2000)
             G0(i+1,1)=(G(1,1));
             G0(i+1,2)=(G(1,2));
             G0(i+1,3)=(G(1,3));
-        elseif i==N                                          %correcting algorithm£¨curve fitting/average value£©
-%             G1(1,1)=polyfit((1:N),G0(:,1)',0);
-%             G1(1,2)=polyfit((1:N),G0(:,2)',0);
-%             G1(1,3)=polyfit((1:N),G0(:,3)',0);
+            
+            if i>0
+                T0(1,i)=T;
+            end
+            
+        elseif i==N                                          %correcting algorithm,T£¨average value£©
             G1(1,1)=1/N*sum(G0(:,1));
             G1(1,2)=1/N*sum(G0(:,2));
             G1(1,3)=1/N*sum(G0(:,3));
@@ -63,6 +67,7 @@ while(i<2000)
             A0(1,i-N+1)=(Acc(1,1));
             A0(2,i-N+1)=(Acc(2,1));
             A0(3,i-N+1)=(Acc(3,1));
+            T=1/(N-1)*sum(T0(1,:))
         elseif i<(2*N)
             A0(1,i-N+1)=(Acc(1,1));
             A0(2,i-N+1)=(Acc(2,1));
@@ -78,42 +83,46 @@ while(i<2000)
                 if abs(sum(A(1,:).^2)-1)<0.04
                     A_static=[0;0;0];
                 end
-            for j=1:3
-                if abs(A_static(j,1))<0.03
-                    V_static(j,1)=0;
-                end
-            end
+%             for j=1:3
+%                 if abs(A_static(j,1))<0.03
+%                     V_static(j,1)=0;
+%                 end
+%             end
         %----------------------------------
             R_static=R_static+V_static*T+(1/2)*A_static*T^2;  %                          displacement
         end        
     end
     %--------------timer------------------(T is the period of each calculation)
-    if(i==0)
-        tic
-    elseif(rem(i,2)==0)
-        T=toc;
-        tic
-    else
-        T=toc;
-        tic;
+    if i<N
+        if(i==0)
+            tic
+        elseif(rem(i,2)==0)
+            T=toc;
+            tic
+        else
+            T=toc;
+            tic;
+        end
     end
 %=================output area================================
     i
-    A
 %     plot3(R_static(1,1),R_static(2,1),R_static(3,1),'o');
 %     axis([-0.5 0.5 -0.5 0.5 -0.5 0.5]);
 %     drawnow
 %------------debugging-----------------
-%    G   
+   G   
 % 	 A_static
 %    V_static
-%    Acc
-   [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3]);
-
-   plot(i,roll/3.14159*180,'or')
+    Q=[q0,q1,q2,q3]
+%     A
+    Acc
+    A_static
+   [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3])
+% 
+   plot(i,A_static(3,1),'or')
    hold on
-   axis([1000 2000 -120 120])
-   title('roll(¡ã)-i')
+   axis([1000 2000 -10 10])
+%    title('roll(¡ã)-i')
    drawnow
 
 %    V_static
@@ -130,5 +139,3 @@ while(i<2000)
 end
 
 fclose(s)
-clear
-clc
