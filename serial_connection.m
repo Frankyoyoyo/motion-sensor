@@ -1,7 +1,7 @@
 clear
 clc
 
-s = serial('COM3');                   %define serial port
+s = serial('COM5');                   %define serial port
 set(s,'BaudRate',9600);               %set baud rate
 fopen(s);                             %open serial port s
 %==============================================================
@@ -20,7 +20,7 @@ A0=zeros(3,N);A1=zeros(3,1);          %for correction
 G0=zeros(N,3);G1=zeros(1,3);          %0-collect data£¬1-correctiong data
 
 
-while(i<2000)
+while(i<1500)
     if(str2double(fgetl(s))~=100)
         continue
     else
@@ -100,21 +100,28 @@ while(i<2000)
 %=================output area================================
     i
     A
-%     plot3(R_static(1,1),R_static(2,1),R_static(3,1),'o');
-%     axis([-0.5 0.5 -0.5 0.5 -0.5 0.5]);
-%     drawnow
+    plot3(R_static(1,1),R_static(2,1),R_static(3,1),'r.','MarkerSize',80);
+    axis([-2 2 -2 2 0 4]);
+    drawnow
+
+%    [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3]);
+%    plot(i,roll/3.14159*180,'or')
+%    hold on
+%    axis([1000 1500 -120 120])
+% %    title('roll(¡ã)-i')
+%    drawnow
+
 %------------debugging-----------------
 %    G   
 % 	 A_static
 %    V_static
 %    Acc
-   [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3]);
-
-   plot(i,roll/3.14159*180,'or')
-   hold on
-   axis([1000 2000 -120 120])
-   title('roll(¡ã)-i')
-   drawnow
+%    [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3]);
+%    plot(i,roll/3.14159*180,'or')
+%    hold on
+%    axis([1000 2000 -120 120])
+%    title('roll(¡ã)-i')
+%    drawnow
 
 %    V_static
 %    R_static
@@ -130,5 +137,3 @@ while(i<2000)
 end
 
 fclose(s)
-clear
-clc
