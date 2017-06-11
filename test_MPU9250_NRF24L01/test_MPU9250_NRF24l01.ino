@@ -6,7 +6,6 @@
 #include <FaBo9Axis_MPU9250.h>
 FaBo9Axis fabo_9axis;
 int k;
-int i = 0;
 float value[7] = {0};
 double pi = 3.1415926;
 
@@ -23,15 +22,14 @@ void setup()
 }
 float a;
 float b;
-float a0,a1,a2,g0,g1,g2;
+float a0, a1, a2, g0, g1, g2;
 void loop()
 {
-  a = millis();
+//  a = millis();
   int j;
-//  i = i + 1;
   float ax, ay, az;
   float gx, gy, gz;
-  a0=a1=a2=g0=g1=g2=0;
+  a0 = a1 = a2 = g0 = g1 = g2 = 0;
   for (j = 0; j < 10; j++)
   {
     fabo_9axis.readAccelXYZ(&ax, &ay, &az);
@@ -52,14 +50,6 @@ void loop()
   gy = g1 / 1800 * pi;
   gz = g2 / 1800 * pi;
 
-  /* Serial.println("100");
-    Serial.println(ax);
-    Serial.println(ay);
-    Serial.println(az);
-    Serial.println(gx);
-    Serial.println(gy);
-    Serial.println(gz);*/
-
   value[0] = 100;
   value[1] = ax;
   value[2] = ay;
@@ -68,14 +58,14 @@ void loop()
   value[5] = gy;
   value[6] = gz;
 
-//  b = millis();     20ms
-  
-  for (k = 0; k < 7; k++) {
-   Mirf.send((byte *)&value[i]);
-   while (Mirf.isSending()) {};
-      delay(200);
-  }                                     //40ms
+  //  b = millis(); //    20ms
 
+  for (k = 0; k < 7; k++) {
+    Mirf.send((byte *)&value[k]);
+    while (Mirf.isSending()) {};
+    delay(20);
+  }                                     //9ms without delay
+  
 //  b = millis();
 //  b = b - a;
 //  Serial.println(b);

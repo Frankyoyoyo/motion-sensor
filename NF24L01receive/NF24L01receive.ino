@@ -14,20 +14,18 @@ void setup() {
 }
 
 void loop() {
-  int a = millis();
-  int i = 0;
-  byte data[7][Mirf.payload];
+//  int a = millis();
+  byte data[Mirf.payload];
 
 //  int b = millis();           0ms
   
-  for (i = 0; i < 7; i++) {
+
     if (!Mirf.isSending() && Mirf.dataReady())         //当接收到数据，从串口输出该数据
     {
-      Mirf.getData(data[i]);
+      Mirf.getData(data);
       Mirf.rxFifoEmpty();   //清理24L01缓存
-      Serial.println(*(float *)data[i]);
+      Serial.println(*(float *)data);
     }
-  }
 //  int b = millis();           //60ms
 //  Serial.println(b-a);
 }

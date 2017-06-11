@@ -1,7 +1,7 @@
 clear
 clc
 
-s = serial('COM5');                   %define serial port
+s = serial('COM3');                   %define serial port
 set(s,'BaudRate',9600);               %set baud rate
 fopen(s);                             %open serial port s
 %==============================================================
@@ -106,10 +106,10 @@ while(i<1500)
 %     axis([-0.5 0.5 -0.5 0.5 -0.5 0.5]);
 %     drawnow
 
-%    [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3]);
-   plot(i,R_static(1,1),'or')
+   [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3]);
+   plot(i,roll/3.14159*180,'or')
    hold on
-   axis([1000 1500 -1 1])
+   axis([1000 1500 -120 120])
 %    title('roll(??)-i')
    drawnow
 
