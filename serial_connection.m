@@ -5,7 +5,7 @@ s = serial('COM3');                   %define serial port
 set(s,'BaudRate',9600);               %set baud rate
 fopen(s);                             %open serial port s
 %==============================================================
-N=500;                                %set the length of correcting matrix
+N=300;                                %set the length of correcting matrix
 %=============================================================
 global A G q0 q1 q2 q3 T halfT g G1
 q0=1;q1=0;q2=0;q3=0;                  %4 parameters of the quaternion,(v=q0+q1i+q2j+q3k)
@@ -75,7 +75,7 @@ while(i<1500)
             A_static=Acc-A1;                                  %static coordinate system??acceleration
             V_static=V_static+A_static*T;                     %                          velocity
         %----------------------------------
-                if abs(sum(A(1,:).^2)-1)<0.04
+                if abs(sum(A(1,:).^2)-1)<0.05
                     A_static=[0;0;0];
                 end
             for j=1:3
@@ -106,10 +106,10 @@ while(i<1500)
 %     axis([-0.5 0.5 -0.5 0.5 -0.5 0.5]);
 %     drawnow
 
-   [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3]);
-   plot(i,roll/3.14159*180,'or')
+%    [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3]);
+   plot(i,A_static(3,1),'or')
    hold on
-   axis([1000 1500 -120 120])
+   axis([600 1500 -10 10])
 %    title('roll(??)-i')
    drawnow
 

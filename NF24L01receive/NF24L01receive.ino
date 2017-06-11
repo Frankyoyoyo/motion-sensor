@@ -14,7 +14,7 @@ void setup() {
 }
 
 void loop() {
-//  int a = millis();
+  int a = millis();
   byte data[Mirf.payload];
 
 //  int b = millis();           0ms
@@ -26,6 +26,6 @@ void loop() {
       Mirf.rxFifoEmpty();   //清理24L01缓存
       Serial.println(*(float *)data);
     }
-//  int b = millis();           //60ms
-//  Serial.println(b-a);
+  int b = millis();           //60ms
+  Serial.println(b-a);
 }
