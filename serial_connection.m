@@ -100,18 +100,20 @@ while(i<1500)
 %=================output area================================
     i
     A
+    Acc
+    A_static
     T
     
-%     plot3(R_static(1,1),R_static(2,1),R_static(3,1),'r.','MarkerSize',80);
-%     axis([-0.5 0.5 -0.5 0.5 -0.5 0.5]);
-%     drawnow
+    plot3(R_static(1,1),R_static(2,1),R_static(3,1),'r.','MarkerSize',80);
+    axis([-0.5 0.5 -0.5 0.5 -0.5 0.5]);
+    drawnow
 
 %    [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3]);
-   plot(i,A_static(3,1),'or')
-   hold on
-   axis([600 1500 -10 10])
-%    title('roll(??)-i')
-   drawnow
+%    plot(i,roll/3.14*180,'or')
+%    hold on
+%    axis([600 1500 -150 150])
+% %    title('roll(??)-i')
+%    drawnow
 
 %------------debugging-----------------
 %    G   

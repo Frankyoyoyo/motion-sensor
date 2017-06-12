@@ -26,6 +26,6 @@ void loop() {
       Mirf.rxFifoEmpty();   //清理24L01缓存
       Serial.println(*(float *)data);
     }
-  int b = millis();           //60ms
-  Serial.println(b-a);
+//  int b = millis();           //60ms
+//  Serial.println(b-a);
 }
