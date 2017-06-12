@@ -2,7 +2,7 @@
 	Kp=2;
 	Ki=0.01;
     halfT=T/2;
-    global A G M q0 q1 q2 q3 halfT T g t G1
+    global A G M q0 q1 q2 q3 halfT T g G1
     G=G-G1;
 	exInt=0;eyInt=0;ezInt=0;
     
