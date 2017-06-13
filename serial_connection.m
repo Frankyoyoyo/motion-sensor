@@ -1,11 +1,11 @@
 clear
 clc
 
-s = serial('COM5');                   %define serial port
+s = serial('COM3');                   %define serial port
 set(s,'BaudRate',9600);               %set baud rate
 fopen(s);                             %open serial port s
 %==============================================================
-N=300;                                %set the length of correcting matrix
+N=500;                                %set the length of correcting matrix
 %=============================================================
 global A G q0 q1 q2 q3 T halfT g G1
 q0=1;q1=0;q2=0;q3=0;                  %4 parameters of the quaternion,(v=q0+q1i+q2j+q3k)
@@ -20,14 +20,13 @@ A0=zeros(3,N);A1=zeros(3,1);          %for correction
 G0=zeros(N,3);G1=zeros(1,3);          %0-collect data??1-correctiong data
 
 
-while(i<1500)
+while(i<3*N)
     if(str2double(fgetl(s))~=100)
         continue
     else
 %==================main part===============================================
         A=[str2double(fgetl(s)),str2double(fgetl(s)),str2double(fgetl(s))];
         G=[str2double(fgetl(s)),str2double(fgetl(s)),str2double(fgetl(s))];
-%         M=[str2double(fgetl(s)),str2double(fgetl(s)),str2double(fgetl(s))];
         
     coordinate_transformation
     %------------------------
@@ -79,7 +78,7 @@ while(i<1500)
                     A_static=[0;0;0];
                 end
             for j=1:3
-                if abs(A_static(j,1))<0.03
+                if abs(A_static(j,1))<0.02
                     V_static(j,1)=0;
                 end
             end
@@ -100,27 +99,42 @@ while(i<1500)
 %=================output area================================
     i
     A
-    Acc
     A_static
-    T
     
-    plot3(R_static(1,1),R_static(2,1),R_static(3,1),'r.','MarkerSize',80);
-    axis([-0.5 0.5 -0.5 0.5 -0.5 0.5]);
-    drawnow
+%     plot3(R_static(1,1),R_static(2,1),R_static(3,1),'r.','MarkerSize',80);
+%     axis([-0.5 0.5 -0.5 0.5 -0.5 0.5]);
+%     drawnow
 
 %    [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3]);
 %    plot(i,roll/3.14*180,'or')
 %    hold on
-%    axis([600 1500 -150 150])
-% %    title('roll(??)-i')
+%    axis([2*N 3*N -120 120])
+%    title('roll(degree)-i')
 %    drawnow
 
+%    plot(i,A_static(3,1),'or')
+%    hold on
+%    axis([2*N 3*N -10 10])
+%    title('a_z(m/s^2)-i')
+%    drawnow
+%
+   plot(i,V_static(3,1),'or')
+   hold on
+   axis([2*N 3*N -2 2])
+   title('v_z(m/s)-i')
+   drawnow
+
+%    plot(i,R_static(3,1),'or')
+%    hold on
+%    axis([2*N 3*N -1 1 ])
+%    title('r_z(m)-i')
+%    drawnow
 %------------debugging-----------------
 %    G   
 % 	 A_static
 %    V_static
 %    Acc
-%    [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3]);
+%    [yaw, pitch, roll] = quat2angle([q0 q1 q2 q3])
 %    plot(i,roll/3.14159*180,'or')
 %    hold on
 %    axis([1000 2000 -120 120])
