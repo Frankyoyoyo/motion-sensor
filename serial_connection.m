@@ -12,7 +12,7 @@ q0=1;q1=0;q2=0;q3=0;                  %4 parameters of the quaternion,(v=q0+q1i+
 A_static=[0; 0; 0];                   %initial acceleration
 V_static=[0; 0; 0];                   %initial velocity
 R_static=[0; 0; 0];                   %initial position
-J=[0,0,1];                           %to make A_static stable
+J=[0;0;0];                           %to make A_static stable
 g=9.81;
 halfT=T/2;
 i=0;T=0;                              %for timer usage
@@ -74,14 +74,15 @@ while(i<3*N)
             A_static=Acc-A1;                                  %static coordinate system??acceleration
             V_static=V_static+A_static*T;                     %                          velocity
         %----------------------------------
-                if abs(sum(A(1,:).^2)-1)<0.05
-                    A_static=[0;0;0];
-                end
+            if abs(sum(A(1,:).^2)-1)<0.05
+                A_static=[0;0;0];
+            end
             for j=1:3
-                if abs(A_static(j,1))<0.02
+                if (abs(A_static(j,1))<0.02)&&(abs(J(j,1))<0.02)
                     V_static(j,1)=0;
                 end
             end
+            J=A_static;
         %----------------------------------
             R_static=R_static+V_static*T+(1/2)*A_static*T^2;  %                          displacement
         end        
@@ -118,17 +119,17 @@ while(i<3*N)
 %    title('a_z(m/s^2)-i')
 %    drawnow
 %
-   plot(i,V_static(3,1),'or')
-   hold on
-   axis([2*N 3*N -2 2])
-   title('v_z(m/s)-i')
-   drawnow
-
-%    plot(i,R_static(3,1),'or')
+%    plot(i,V_static(3,1),'or')
 %    hold on
-%    axis([2*N 3*N -1 1 ])
-%    title('r_z(m)-i')
+%    axis([2*N 3*N -2 2])
+%    title('v_z(m/s)-i')
 %    drawnow
+
+   plot(i,R_static(3,1),'or')
+   hold on
+   axis([2*N 3*N -1 1 ])
+   title('r_z(m)-i')
+   drawnow
 %------------debugging-----------------
 %    G   
 % 	 A_static
